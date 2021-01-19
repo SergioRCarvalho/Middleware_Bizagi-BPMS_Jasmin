@@ -13,20 +13,6 @@ const AuthStr = 'Bearer '.concat(USER_TOKEN);
 app.use(bodyParser.json());
 
 
-//create database connection
-/*const conn = mysql.createConnection({
-  host: '',
-  user: '',
-  password: '',
-  database: ''
-});*/
-
-
-//connect to database
-/*conn.connect((err) =>{
-  if(err) throw err;
-  console.log('Mysql Connected...');
-});*/
 
 //##############################################################################################################################
 // retorna todoas as encomendas
@@ -46,23 +32,40 @@ app.get('/api/getAllOrders',(req, res) => {
 });
 
 //##############################################################################################################################
+// retorna todos os users
+app.get('/api/getAllUsers',(req, res) => {
+
+  const URL = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders';
+  
+  axios.get(URL, 
+      { headers: { Authorization: AuthStr } })
+   .then(response => {
+     res.send(response.data);
+   })
+   .catch((error) => {
+     console.log(error)
+   })
+
+});
+
+//##############################################################################################################################
 // retorna o stock do produto que foi feito encomenda
 app.get('/api/getStockLastOrder',(req, res) => {
   
-  let sql = "SELECT * FROM encomenda ORDER BY idencomenda DESC";
-   let query = conn.query(sql,(err, results) => {
-    if(err) throw err;
+ // let sql = "SELECT * FROM encomenda ORDER BY idencomenda DESC";
+//   let query = conn.query(sql,(err, results) => {
+  //  if(err) throw err;
     
-    var idEncomenda = results[0].novaencomenda;
+  //  var idEncomenda = results[0].novaencomenda;
 
-    const URL = 'https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/' + idEncomenda;
+    const URL = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/1';
     
     axios.get(URL, 
         { headers: { Authorization: AuthStr } })
       .then(response => {
         var quantidade = response.data.documentLines[0].quantity;
         var item = response.data.documentLines[0].salesItem;
-        var stockJasmin = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/" + item + "/extension"
+        var stockJasmin = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/" + item + "/extension"
 		
         getStockBalance(stockJasmin, quantidade)
 
@@ -73,7 +76,8 @@ app.get('/api/getStockLastOrder',(req, res) => {
 
   });
 
-   function getStockBalance(link, qtd){
+  
+   /*function getStockBalance(link, qtd){
 
      axios.get(link, 
       { headers: { Authorization: AuthStr } })
@@ -92,21 +96,21 @@ app.get('/api/getStockLastOrder',(req, res) => {
         console.log(error)
       })
       
-  }
+  
 
-});
+});*/
 
 
 //##############################################################################################################################
 app.get('/api/getLastOrderXML',(req, res) => {
   
-  let sql = "SELECT * FROM encomenda ORDER BY idencomenda DESC";
+ // let sql = "SELECT * FROM encomenda ORDER BY idencomenda DESC";
    let query = conn.query(sql,(err, results) => {
     if(err) throw err;
     
     var idencomenda = results[0].novaencomenda;
 
-    const URL = 'https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/' + idencomenda;
+    const URL = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/1';
     
     axios.get(URL, 
         { headers: { Authorization: AuthStr } })
@@ -136,7 +140,7 @@ app.get('/api/getLastOrderJSON',(req, res) => {
     
     var idencomenda = results[0].novaencomenda;
 
-    const URL = 'https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/' + idencomenda;
+    const URL = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/' + idencomenda;
     
     axios.get(URL, 
         { headers: { Authorization: AuthStr } })
@@ -157,7 +161,7 @@ app.get('/api/getLastOrderJSON',(req, res) => {
 // não usado
 app.put('/api/putStockBalance',(req, res) => {
   
-  var putLink = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/TELEMOVEL/materialsItemWarehouses/9707ad34-4f1b-ea11-b265-0003ff245385/stockBalance";
+  var putLink = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/TELEMOVEL/materialsItemWarehouses/9707ad34-4f1b-ea11-b265-0003ff245385/stockBalance";
   var put = 1;
 
 
@@ -183,7 +187,7 @@ fetch(putLink, options)
 
 app.post('/api/criaFatura',(req, res) => {
   
-  var putLink = "https://my.jasminsoftware.com/api/225185/225185-0002/billing/processOrders/BillingOrder/a106d9be-4024-ea11-8454-0003ff2970e1";
+  var putLink = "https://my.jasminsoftware.com/api/246190/246190-0001/billing/processOrders/BillingOrder/a106d9be-4024-ea11-8454-0003ff2970e1";
 
   const options = {
       method: 'POST',
@@ -239,7 +243,7 @@ app.post('/api/insereFatura',(req, res) => {
 
 
    function getProduto(stock,encomenda){
-     var jasminLink = 'https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/' + encomenda;
+     var jasminLink = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/' + encomenda;
      var produto;
      var stockBalance;
         
@@ -262,7 +266,7 @@ app.post('/api/insereFatura',(req, res) => {
 
    function getStockProduto(stock,encomenda,produto){
 
-    var jasminLink3 = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/" + produto;
+    var jasminLink3 = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/" + produto;
     var stockBalance;
     axios.get(jasminLink3, 
       { headers: { Authorization: AuthStr } })
@@ -283,7 +287,7 @@ app.post('/api/insereFatura',(req, res) => {
 
 
    function updateStockBalance(stock,stockBalance,produto,encomenda,produtoID){
-      var jasminLinkUpdate = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/" + produto + "/materialsItemWarehouses/"+ produtoID +"/stockBalance";
+      var jasminLinkUpdate = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/" + produto + "/materialsItemWarehouses/"+ produtoID +"/stockBalance";
       
       var newStock = 0;
       newStock = stockBalance + stock;
@@ -350,7 +354,7 @@ app.post('/api/insereFatura',(req, res) => {
       } // end dados
 
       // Axios request insere fatura
-      var jasminLink4 = "https://my.jasminsoftware.com/api/225185/225185-0002/billing/invoices";
+      var jasminLink4 = "https://my.jasminsoftware.com/api/246190/246190-0001/billing/invoices";
 
       axios.post(jasminLink4,dados,
         { headers: { Authorization: AuthStr}}
@@ -393,7 +397,7 @@ app.post('/api/guiaRemessaFatura',(req, res) => {
 
   function getProduto(stockBD){
     var produtoID;
-    var jasminLink = 'https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/' + idEncomenda;
+    var jasminLink = 'https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/' + idEncomenda;
 
     axios.get(jasminLink, 
          { headers: { Authorization: AuthStr } })
@@ -411,7 +415,7 @@ app.post('/api/guiaRemessaFatura',(req, res) => {
 
 
  function getStockBalanceJasmin(produtoID,stockBD){
-  var URL = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/" + produtoID;
+  var URL = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/" + produtoID;
   var stockJasmin;
 
   axios.get(URL, 
@@ -435,7 +439,7 @@ app.post('/api/guiaRemessaFatura',(req, res) => {
  function postStockBalanceJasmin(produtoID,stockBD,stockJasmin,id){
   var stockFinal = stockJasmin + stockBD;
 
-  var jasminLinkUpdate = "https://my.jasminsoftware.com/api/225185/225185-0002/materialsCore/materialsItems/" + produtoID + "/materialsItemWarehouses/"+ id +"/stockBalance";
+  var jasminLinkUpdate = "https://my.jasminsoftware.com/api/246190/246190-0001/materialsCore/materialsItems/" + produtoID + "/materialsItemWarehouses/"+ id +"/stockBalance";
     
   const options = {
     method: 'PUT',
@@ -458,7 +462,7 @@ app.post('/api/guiaRemessaFatura',(req, res) => {
 
  function encomenda(stockBD){
     // encomenda
-  var url = "https://my.jasminsoftware.com/api/225185/225185-0002/sales/orders/" + idEncomenda;
+  var url = "https://my.jasminsoftware.com/api/246190/246190-0001/sales/orders/" + idEncomenda;
 
 
   axios.get(url, 
@@ -490,7 +494,7 @@ async function guia(stockBD,naturalKeyencomenda){
       }
       console.log(dados);
 
-   var url = "https://my.jasminsoftware.com/api/225185/225185-0002/shipping/processOrders/DEFAULT";
+   var url = "https://my.jasminsoftware.com/api/246190/246190-0001/shipping/processOrders/DEFAULT";
 
   
 
@@ -519,7 +523,7 @@ async function guia(stockBD,naturalKeyencomenda){
 
 
 function getNaturalKeyguia(guiaID,quantity,naturalKeyencomenda){
-  var url = "https://my.jasminsoftware.com/api/225185/225185-0002/shipping/deliveries/" + guiaID;
+  var url = "https://my.jasminsoftware.com/api/246190/246190-0001/shipping/deliveries/" + guiaID;
 
   axios.get(url, 
     { headers: { Authorization: AuthStr } })
@@ -541,7 +545,7 @@ function fatura(naturalKeyguia,quantity,naturalKeyencomenda){
     // fatura 
     var deliveryKey = naturalKeyguia;
     var orderKey = naturalKeyencomenda;
-    var url = "https://my.jasminsoftware.com/api/225185/225185-0002/billing/processOrders/DEFAULT";
+    var url = "https://my.jasminsoftware.com/api/246190/246190-0001/billing/processOrders/DEFAULT";
 
     var dados = {
       deliveryKey: `${deliveryKey}`,
